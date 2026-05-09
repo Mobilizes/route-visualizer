@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-Perlin::Perlin(unsigned int width, unsigned int height, double scale)
+Perlin::Perlin(size_t width, size_t height, double scale)
 : width(width), height(height), scale(scale)
 {
   res.clear();
@@ -20,8 +20,8 @@ void Perlin::generate()
   std::shuffle(perm, perm + 256, gen);
   for (int i = 0; i < 256; ++i) perm[i + 256] = perm[i];
 
-  for (unsigned int i = 0; i < width; ++i) {
-    for (unsigned int j = 0; j < height; ++j) {
+  for (size_t i = 0; i < width; ++i) {
+    for (size_t j = 0; j < height; ++j) {
       res[i * height + j] =
         (perlin_noise(i / scale, j / scale) + 1.0) / 2.0;  // 0.0 <= res[i][j] <= 1.0
     }

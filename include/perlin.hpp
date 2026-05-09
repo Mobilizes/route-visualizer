@@ -9,7 +9,7 @@ class Perlin
 {
 private:
 public:
-  Perlin(unsigned int width, unsigned int height, double volatility);
+  Perlin(size_t width, size_t height, double volatility);
 
   double scale;
 
@@ -18,8 +18,8 @@ public:
   double get(size_t i, size_t j);
 
 private:
-  unsigned int width;
-  unsigned int height;
+  size_t width;
+  size_t height;
   std::mt19937 gen;
 
   std::vector<double> res;
