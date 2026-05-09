@@ -15,14 +15,14 @@ public:
 
   void generate();
 
-  double get(size_t i, size_t j);
+  const std::vector<std::vector<double>> & get();
 
 private:
   size_t width;
   size_t height;
   std::mt19937 gen;
 
-  std::vector<double> res;
+  std::vector<std::vector<double>> noises;
 
   double perlin_noise(double x, double y);
   std::pair<double, double> const_vector(int v);

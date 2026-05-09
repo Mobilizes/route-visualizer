@@ -1,20 +1,19 @@
 #include "perlin.hpp"
 
 #include <algorithm>
-#include <stdexcept>
 
 Perlin::Perlin(size_t width, size_t height, double scale)
 : width(width), height(height), scale(scale)
 {
-  res.clear();
+  noises.clear();
 }
 
 void Perlin::generate()
 {
   std::mt19937 gen(std::random_device{}());
 
-  res.clear();
-  res.assign(width * height, 0);
+  noises.clear();
+  noises.assign(width, std::vector<double>(height, 0.0));
 
   std::iota(perm, perm + 256, 0);
   std::shuffle(perm, perm + 256, gen);
@@ -22,19 +21,12 @@ void Perlin::generate()
 
   for (size_t i = 0; i < width; ++i) {
     for (size_t j = 0; j < height; ++j) {
-      res[i * height + j] =
-        (perlin_noise(i / scale, j / scale) + 1.0) / 2.0;  // 0.0 <= res[i][j] <= 1.0
+      noises[i][j] = (perlin_noise(i / scale, j / scale) + 1.0) / 2.0;  // 0.0 <= res[i][j] <= 1.0
     }
   }
 }
 
-double Perlin::get(size_t i, size_t j)
-{
-  if (res.empty()) throw std::runtime_error("Map: not generated!");
-  if (i >= width || j >= height || (i * height + j) >= (width * height))
-    throw std::runtime_error("Map: Out of bounds index!");
-  return res[i * height + j];
-}
+const std::vector<std::vector<double>> & Perlin::get() { return noises; }
 
 double Perlin::perlin_noise(double x, double y)
 {
