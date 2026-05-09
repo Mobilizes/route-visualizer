@@ -29,11 +29,11 @@ cd build && make -j8
 ```
 
 ## How it works (TODO)
-- Generate perlin noise for continuous random weight
-- Generate random graph, with weight using values from the perlin noises.
-- Raylib to visualize the graph in easy to understand way
-- Dijkstra algorithm to get shortest path from user's chosen starting point
-- Raylib to also visualize the path
+- [x] Generate perlin noise for continuous random weight
+- [ ] Generate random graph, with weight using values from the perlin noises.
+- [ ] Raylib to visualize the graph in easy to understand way
+- [ ] Dijkstra algorithm to get shortest path from user's chosen starting point
+- [ ] Raylib to also visualize the path.
 
 ## References
 - [Excellent perlin noise explanation!](https://rtouti.github.io/graphics/perlin-noise-algorithm)
