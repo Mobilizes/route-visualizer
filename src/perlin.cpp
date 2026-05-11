@@ -1,6 +1,7 @@
 #include "perlin.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 
 Perlin::Perlin(size_t width, size_t height, double scale)
 : width(width), height(height), scale(scale)
@@ -10,13 +11,13 @@ Perlin::Perlin(size_t width, size_t height, double scale)
 
 void Perlin::generate()
 {
-  std::mt19937 gen(std::random_device{}());
+  mt = std::mt19937(std::random_device{}());
 
   noises.clear();
   noises.assign(width, std::vector<double>(height, 0.0));
 
   std::iota(perm, perm + 256, 0);
-  std::shuffle(perm, perm + 256, gen);
+  std::shuffle(perm, perm + 256, mt);
   for (int i = 0; i < 256; ++i) perm[i + 256] = perm[i];
 
   for (size_t i = 0; i < width; ++i) {
@@ -26,7 +27,14 @@ void Perlin::generate()
   }
 }
 
-const std::vector<std::vector<double>> & Perlin::get() { return noises; }
+const std::vector<std::vector<double>> & Perlin::get()
+{
+  if (noises.empty()) throw std::runtime_error("Perlin: called `get` before `generate()`");
+  return noises;
+}
+
+const size_t & Perlin::get_width() { return width; }
+const size_t & Perlin::get_height() { return height; }
 
 double Perlin::perlin_noise(double x, double y)
 {

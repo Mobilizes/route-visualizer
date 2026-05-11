@@ -1,15 +1,27 @@
+#include "map.hpp"
 #include "perlin.hpp"
 
 #include <raylib.h>
 
 int main()
 {
-  int width = 300;
-  int height = 300;
-  double scale = 10.0;
+  int perlin_width = 30;
+  int perlin_height = 30;
 
-  Perlin map(width, height, scale);
+  double perlin_scale = 5.0;
+  Perlin perlin(perlin_width, perlin_height, perlin_scale);
+  perlin.generate();
+
+  int map_width = 20;
+  int map_height = 20;
+
+  unsigned int value_scale = 255;
+  Map map(map_width, map_height, value_scale, perlin);
   map.generate();
+
+  const std::vector<std::vector<unsigned int>> & vec_map = map.get();
+
+  const int pixel_size = 16;
 
   InitWindow(800, 600, "Route Visualization");
 
@@ -17,15 +29,13 @@ int main()
     BeginDrawing();
     ClearBackground(WHITE);
 
-    map.generate();
+    for (int i = 0; i < map_width; ++i) {
+      for (int j = 0; j < map_height; ++j) {
+        unsigned char v = vec_map[i][j];
+        Color c = {v, v, v, 255};
+        if (vec_map[i][j] == Map::NONROAD_TILE) c = {0, 0, 255, 255};
 
-    int rect_width = std::max(1, 800 / width);
-    int rect_height = std::max(1, 600 / height);
-    for (int i = 0; i < width; ++i) {
-      for (int j = 0; j < height; ++j) {
-        unsigned char val = 255 * map.get()[i][j];
-        DrawRectangle(i * rect_width, j * rect_height, rect_width,
-          rect_height, {val, val, val, 255});
+        DrawRectangle(i * pixel_size, j * pixel_size, pixel_size, pixel_size, c);
       }
     }
 

@@ -16,11 +16,14 @@ public:
   void generate();
 
   const std::vector<std::vector<double>> & get();
+  const size_t & get_width();
+  const size_t & get_height();
 
 private:
   size_t width;
   size_t height;
-  std::mt19937 gen;
+
+  std::mt19937 mt;
 
   std::vector<std::vector<double>> noises;
 

@@ -38,3 +38,4 @@ cd build && make -j8
 ## References
 - [Excellent perlin noise explanation!](https://rtouti.github.io/graphics/perlin-noise-algorithm)
 - [Raylib, a very powerful C and C++ compatible graphics library! Highly recommend to those that want to explore.](https://www.raylib.com/cheatsheet/cheatsheet.html)
+- [cplusplus.com, useful documentation.](https://cplusplus.com)
