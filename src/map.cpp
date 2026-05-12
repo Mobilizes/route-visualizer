@@ -51,10 +51,7 @@ void Map::generate()
   do {
     int dir = dist_dir(mt);
     grow(dist_pos_i(mt), dist_pos_j(mt), dir);
-  } while (count_non_empty < width * height / 3);
-
-  unsigned int min_noise = UINT32_MAX;
-  unsigned int max_noise = 0;
+  } while (count_non_empty < width * height / 4);
 
   for (size_t i = 0; i < width; ++i) {
     for (size_t j = 0; j < height; ++j) {
@@ -62,26 +59,8 @@ void Map::generate()
         continue;
       }
       map[i][j] = std::round(sliced_perlin_noises[i][j] * scale);
-      min_noise = std::min(min_noise, map[i][j]);
-      max_noise = std::max(max_noise, map[i][j]);
     }
   }
-
-  for (size_t i = 0; i < width; ++i) {
-    for (size_t j = 0; j < height; ++j) {
-      if (map[i][j] == NONROAD_TILE) {
-        continue;
-      }
-      map[i][j] = (map[i][j] - min_noise) * (255 / (max_noise - min_noise));
-    }
-  }
-
-  // 700 - 1000
-  // 0 - 255
-  // 300 / 255 = 1.17647
-  // 255 / 300 = 0.85
-  // 750 -> 50 * 0.85 + 0 = 42.5
-  // dest_min + (v - src_min) * (range_dest / range_src)
 }
 
 const std::vector<std::vector<unsigned int>> & Map::get()
