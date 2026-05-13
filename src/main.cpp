@@ -80,9 +80,8 @@ int main()
 
       bool reset = false;
 
-      if (mouse_x < x_offset ||
-          mouse_x > static_cast<int>(map.width) * pixel_size + x_offset || mouse_y < y_offset ||
-          mouse_y > static_cast<int>(map.height) * pixel_size + y_offset) {
+      if (mouse_x < x_offset || mouse_x > static_cast<int>(map.width) * pixel_size + x_offset ||
+          mouse_y < y_offset || mouse_y > static_cast<int>(map.height) * pixel_size + y_offset) {
         reset = true;
       } else if (src_i == UINT32_MAX) {
         src_i = (mouse_x - x_offset) / pixel_size;
@@ -124,6 +123,16 @@ int main()
 
       map.width = 400 / pixel_size;
       map.height = 400 / pixel_size;
+      map.generate();
+
+      src_i = UINT32_MAX;
+      src_j = 0;
+      dest_i = UINT32_MAX;
+      dest_j = 0;
+      path = std::nullopt;
+    }
+
+    if (GuiButton(Rectangle(510, 300, 80, 50), "Regenerate")) {
       map.generate();
 
       src_i = UINT32_MAX;

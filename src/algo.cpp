@@ -23,8 +23,7 @@ std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_pat
   if (src_i >= map.width || src_j >= map.height) return std::nullopt;
 
   std::priority_queue<std::vector<long long>, std::vector<std::vector<long long>>, Comparator> pq;
-  std::vector<std::vector<bool>> visited(
-    map.width, std::vector<bool>(map.height, false));
+  std::vector<std::vector<bool>> visited(map.width, std::vector<bool>(map.height, false));
   std::vector<std::vector<std::pair<long long, unsigned>>> mp(
     map.width, std::vector<std::pair<long long, unsigned>>(map.height, {LLONG_MAX, 5}));
   const auto & map_ref = map.get();
