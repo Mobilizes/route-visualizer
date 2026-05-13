@@ -47,6 +47,11 @@ int main()
     BeginDrawing();
     ClearBackground(WHITE);
 
+    DrawRectangleGradientH(x_offset, 520, 400, 50, WHITE, BLACK);
+    DrawRectangleLines(x_offset, 520, 400, 50, GRAY);
+    DrawText("Low", x_offset, 500, 14, BLACK);
+    DrawText("High", x_offset + 375, 500, 14, BLACK);
+
     for (int i = 0; i < static_cast<int>(map.width); ++i) {
       for (int j = 0; j < static_cast<int>(map.height); ++j) {
         unsigned char v = map.get()[i][j];
