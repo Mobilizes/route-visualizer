@@ -23,6 +23,7 @@ public:
 
   size_t width;
   size_t height;
+  double chance;
 
 private:
   enum

@@ -20,6 +20,8 @@ Map::Map(size_t width, size_t height, unsigned int scale, Perlin & perlin)
   if (height > perlin.get_height()) {
     throw std::invalid_argument("Map: You can't give higher `height` than `perlin`'s `height`");
   }
+
+  chance = 0.2;
 }
 
 void Map::generate()
@@ -108,7 +110,6 @@ bool Map::grow(int i, int j, int from_dir)
   std::uniform_int_distribution<int> dist_dist(1, dist_to_bounds);
   int dist = dist_dist(mt);
 
-  double chance = 0.2;
   std::uniform_real_distribution<double> dist_chance(0, 1);
 
   switch (to_dir) {

@@ -3,7 +3,6 @@
 #include "perlin.hpp"
 
 #include <raylib.h>
-#include <print>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -39,7 +38,10 @@ int main()
 
   InitWindow(800, 600, "Route Visualization");
 
+  std::string error_message = "";
+
   float raw_render_size = render_size;
+  float raw_chance = map.chance;
 
   std::optional<std::vector<std::pair<unsigned, unsigned>>> path = std::nullopt;
 
@@ -49,6 +51,7 @@ int main()
 
     DrawRectangleGradientH(x_offset, 520, 400, 50, WHITE, BLACK);
     DrawRectangleLines(x_offset, 520, 400, 50, GRAY);
+    DrawText("Weight representation of each tile:", x_offset, 475, 18, BLACK);
     DrawText("Low", x_offset, 500, 14, BLACK);
     DrawText("High", x_offset + 375, 500, 14, BLACK);
 
@@ -103,6 +106,12 @@ int main()
         path = Algo::get_shortest_path(map, src_i, src_j, dest_i, dest_j);
         if (!path.has_value()) {
           reset = true;
+          error_message = "Path not found!";
+        }
+
+        if (map.get()[dest_i][dest_j] == Map::NONROAD_TILE) {
+          reset = true;
+          error_message = "Please pick a weighted tile from the map.";
         }
       } else {
         reset = true;
@@ -112,10 +121,13 @@ int main()
         src_i = UINT32_MAX;
         dest_i = UINT32_MAX;
         path = std::nullopt;
+      } else {
+        error_message = "";
       }
     }
 
-    GuiSliderBar(Rectangle(500, 150, 100, 50), "min", "max", &raw_render_size, 1.0f, 5.0f);
+    DrawText("Render size", 500, 130, 16, BLACK);
+    GuiSliderBar(Rectangle(500, 150, 100, 50), "1", "5", &raw_render_size, 1.0f, 5.0f);
     int next_render_size = static_cast<int>(std::round(raw_render_size));
 
     if (next_render_size != render_size) {
@@ -137,7 +149,15 @@ int main()
       path = std::nullopt;
     }
 
-    if (GuiButton(Rectangle(510, 300, 80, 50), "Regenerate")) {
+    DrawText("Chance for initial points to grow", 500, 230, 16, BLACK);
+    GuiSliderBar(Rectangle(500, 250, 100, 50), "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
+    if (std::fabs(raw_chance - map.chance) > 0.0001) {
+      map.chance = raw_chance;
+
+      map.generate();
+    }
+
+    if (GuiButton(Rectangle(510, 350, 80, 50), "Regenerate")) {
       map.generate();
 
       src_i = UINT32_MAX;
@@ -146,6 +166,8 @@ int main()
       dest_j = 0;
       path = std::nullopt;
     }
+
+    DrawText(error_message.c_str(), 500, 500, 14, RED);
 
     EndDrawing();
   }
