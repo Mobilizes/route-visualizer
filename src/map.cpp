@@ -25,6 +25,7 @@ Map::Map(size_t width, size_t height, unsigned int scale, Perlin & perlin)
 void Map::generate()
 {
   mt = std::mt19937(std::random_device{}());
+  count_non_empty = 0;
 
   std::uniform_int_distribution<unsigned int> dist_i(0, perlin.get_width() - width);
   std::uniform_int_distribution<unsigned int> dist_j(0, perlin.get_height() - height);
@@ -43,6 +44,7 @@ void Map::generate()
 
   map.clear();
   map.assign(width, std::vector<unsigned int>(height, NONROAD_TILE));
+  count_non_empty = 0;
 
   std::uniform_int_distribution<int> dist_pos_i(0, width - 1);
   std::uniform_int_distribution<int> dist_pos_j(0, height - 1);
@@ -68,12 +70,11 @@ const std::vector<std::vector<unsigned int>> & Map::get()
   if (map.empty()) throw std::runtime_error("Perlin: called `get` before `generate()`");
   return map;
 }
-const size_t & Map::get_width() { return width; }
-const size_t & Map::get_height() { return height; }
 
 bool Map::grow(int i, int j, int from_dir)
 {
   if (i < 0 || i >= width || j < 0 || j >= height) return false;
+  if (count_non_empty > width * height / 3) return false;
 
   int to_dir = ((from_dir - 1) + 2) % 4 + 1;
 
@@ -107,7 +108,7 @@ bool Map::grow(int i, int j, int from_dir)
   std::uniform_int_distribution<int> dist_dist(1, dist_to_bounds);
   int dist = dist_dist(mt);
 
-  const double CHANCE = 0.4;
+  double chance = 0.2;
   std::uniform_real_distribution<double> dist_chance(0, 1);
 
   switch (to_dir) {
@@ -117,8 +118,8 @@ bool Map::grow(int i, int j, int from_dir)
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[idx][j] = 0;
-        if (dist_chance(mt) <= CHANCE) grow(idx, j, DIR_DOWN);
-        if (dist_chance(mt) <= CHANCE) grow(idx, j, DIR_UP);
+        if (dist_chance(mt) <= chance) grow(idx, j, DIR_DOWN);
+        if (dist_chance(mt) <= chance) grow(idx, j, DIR_UP);
       }
       break;
     }
@@ -129,8 +130,8 @@ bool Map::grow(int i, int j, int from_dir)
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
-        if (dist_chance(mt) <= CHANCE) grow(i, idx, DIR_LEFT);
-        if (dist_chance(mt) <= CHANCE) grow(i, idx, DIR_RIGHT);
+        if (dist_chance(mt) <= chance) grow(i, idx, DIR_LEFT);
+        if (dist_chance(mt) <= chance) grow(i, idx, DIR_RIGHT);
       }
       break;
     }
@@ -141,8 +142,8 @@ bool Map::grow(int i, int j, int from_dir)
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[idx][j] = 0;
-        if (dist_chance(mt) <= CHANCE) grow(idx, j, DIR_DOWN);
-        if (dist_chance(mt) <= CHANCE) grow(idx, j, DIR_UP);
+        if (dist_chance(mt) <= chance) grow(idx, j, DIR_DOWN);
+        if (dist_chance(mt) <= chance) grow(idx, j, DIR_UP);
       }
       break;
     }
@@ -153,8 +154,8 @@ bool Map::grow(int i, int j, int from_dir)
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
-        if (dist_chance(mt) <= CHANCE) grow(i, idx, DIR_LEFT);
-        if (dist_chance(mt) <= CHANCE) grow(i, idx, DIR_RIGHT);
+        if (dist_chance(mt) <= chance) grow(i, idx, DIR_LEFT);
+        if (dist_chance(mt) <= chance) grow(i, idx, DIR_RIGHT);
       }
       break;
     }

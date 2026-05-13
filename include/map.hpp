@@ -20,8 +20,9 @@ public:
   void generate();
 
   const std::vector<std::vector<unsigned int>> & get();
-  const size_t & get_width();
-  const size_t & get_height();
+
+  size_t width;
+  size_t height;
 
 private:
   enum
@@ -36,8 +37,6 @@ private:
 
   int count_non_empty_neighboring_tile(int i, int j, int from_dir);
 
-  size_t width;
-  size_t height;
   unsigned int scale;
 
   std::mt19937 mt;

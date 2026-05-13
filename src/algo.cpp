@@ -1,23 +1,32 @@
 #include <algo.hpp>
 
+#include <algorithm>
 #include <array>
 #include <climits>
-#include <print>
 #include <queue>
 
 const std::array<int, 4> dir_i = {1, 0, -1, 0};
 const std::array<int, 4> dir_j = {0, 1, 0, -1};
 
+class Comparator
+{
+public:
+  bool operator()(const std::vector<long long> & a, const std::vector<long long> & b)
+  {
+    return a[0] > b[0];
+  }
+};
+
 std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_path(
   Map & map, unsigned src_i, unsigned src_j, unsigned dest_i, unsigned dest_j)
 {
-  std::priority_queue<std::vector<long long>, std::vector<std::vector<long long>>,
-    std::greater<std::vector<long long>>>
-    pq;
+  if (src_i >= map.width || src_j >= map.height) return std::nullopt;
+
+  std::priority_queue<std::vector<long long>, std::vector<std::vector<long long>>, Comparator> pq;
   std::vector<std::vector<bool>> visited(
-    map.get_width(), std::vector<bool>(map.get_height(), false));
+    map.width, std::vector<bool>(map.height, false));
   std::vector<std::vector<std::pair<long long, unsigned>>> mp(
-    map.get_width(), std::vector<std::pair<long long, unsigned>>(map.get_height(), {LLONG_MAX, 5}));
+    map.width, std::vector<std::pair<long long, unsigned>>(map.height, {LLONG_MAX, 5}));
   const auto & map_ref = map.get();
 
   pq.push({0, src_i, src_j});
@@ -34,7 +43,7 @@ std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_pat
     int i = tp[1];
     int j = tp[2];
 
-    if (i < 0 || j < 0 || i >= map.get_width() || j >= map.get_height()) continue;
+    if (i < 0 || j < 0 || i >= map.width || j >= map.height) continue;
     visited[i][j] = true;
     if (map_ref[i][j] == Map::NONROAD_TILE) continue;
     if (i == dest_i && j == dest_j) break;
@@ -42,7 +51,7 @@ std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_pat
     for (int k = 0; k < 4; ++k) {
       int a = i + dir_i[k];
       int b = j + dir_j[k];
-      if (a < 0 || b < 0 || a > map.get_width() - 1 || b > map.get_height() - 1) continue;
+      if (a < 0 || b < 0 || a > map.width - 1 || b > map.height - 1) continue;
       if (visited[a][b]) continue;
       if (map_ref[a][b] == Map::NONROAD_TILE) continue;
 
@@ -52,14 +61,6 @@ std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_pat
       }
     }
   }
-
-  for (auto i : mp) {
-    for (auto j : i) {
-      std::print("{0} ", j.second);
-    }
-    std::println();
-  }
-  std::println();
 
   std::vector<std::pair<unsigned, unsigned>> path;
   int i = (int)dest_i;
@@ -76,7 +77,6 @@ std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_pat
 
   path.push_back({(unsigned)i, (unsigned)j});
   std::reverse(path.begin(), path.end());
-  std::println("{0}", path.size());
 
   return path;
 }
