@@ -18,6 +18,7 @@ public:
   Map(size_t width, size_t height, unsigned int scale, Perlin & perlin);
 
   void generate();
+  void update_weights();
 
   const std::vector<std::vector<unsigned int>> & get();
 

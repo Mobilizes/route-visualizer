@@ -22,12 +22,34 @@ Map::Map(size_t width, size_t height, unsigned int scale, Perlin & perlin)
   }
 
   chance = 0.2;
+  map.clear();
 }
 
 void Map::generate()
 {
   mt = std::mt19937(std::random_device{}());
+
+  map.clear();
+  map.assign(width, std::vector<unsigned int>(height, NONROAD_TILE));
   count_non_empty = 0;
+
+  std::uniform_int_distribution<int> dist_pos_i(0, width - 1);
+  std::uniform_int_distribution<int> dist_pos_j(0, height - 1);
+  std::uniform_int_distribution<int> dist_dir(1, 4);
+
+  do {
+    int dir = dist_dir(mt);
+    grow(dist_pos_i(mt), dist_pos_j(mt), dir);
+  } while (count_non_empty < width * height / 4);
+
+  update_weights();
+}
+
+void Map::update_weights()
+{
+  if (map.empty()) {
+    throw std::runtime_error("Map: tried to update map weight before generating the map itself.");
+  }
 
   std::uniform_int_distribution<unsigned int> dist_i(0, perlin.get_width() - width);
   std::uniform_int_distribution<unsigned int> dist_j(0, perlin.get_height() - height);
@@ -43,19 +65,6 @@ void Map::generate()
     sliced_perlin_noises.push_back(
       std::vector<double>(src.begin() + j_offset, src.begin() + j_offset + height));
   }
-
-  map.clear();
-  map.assign(width, std::vector<unsigned int>(height, NONROAD_TILE));
-  count_non_empty = 0;
-
-  std::uniform_int_distribution<int> dist_pos_i(0, width - 1);
-  std::uniform_int_distribution<int> dist_pos_j(0, height - 1);
-  std::uniform_int_distribution<int> dist_dir(1, 4);
-
-  do {
-    int dir = dist_dir(mt);
-    grow(dist_pos_i(mt), dist_pos_j(mt), dir);
-  } while (count_non_empty < width * height / 4);
 
   for (size_t i = 0; i < width; ++i) {
     for (size_t j = 0; j < height; ++j) {

@@ -3,6 +3,7 @@
 #include "perlin.hpp"
 
 #include <raylib.h>
+#include <print>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -42,6 +43,7 @@ int main()
 
   float raw_render_size = render_size;
   float raw_chance = map.chance;
+  float raw_perlin_scale = perlin.scale;
 
   std::optional<std::vector<std::pair<unsigned, unsigned>>> path = std::nullopt;
 
@@ -126,8 +128,8 @@ int main()
       }
     }
 
-    DrawText("Render size", 500, 130, 16, BLACK);
-    GuiSliderBar(Rectangle(500, 150, 100, 50), "1", "5", &raw_render_size, 1.0f, 5.0f);
+    DrawText("Render size", 500, 30, 16, BLACK);
+    GuiSliderBar(Rectangle(500, 50, 100, 50), "1", "5", &raw_render_size, 1.0f, 5.0f);
     int next_render_size = static_cast<int>(std::round(raw_render_size));
 
     if (next_render_size != render_size) {
@@ -149,12 +151,21 @@ int main()
       path = std::nullopt;
     }
 
-    DrawText("Chance for initial points to grow", 500, 230, 16, BLACK);
-    GuiSliderBar(Rectangle(500, 250, 100, 50), "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
+    DrawText("Chance for initial points to grow", 500, 130, 16, BLACK);
+    GuiSliderBar(Rectangle(500, 150, 100, 50), "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
     if (std::fabs(raw_chance - map.chance) > 0.0001) {
       map.chance = raw_chance;
 
       map.generate();
+    }
+
+    DrawText("Perlin Scale", 500, 230, 16, BLACK);
+    GuiSliderBar(Rectangle(500, 250, 100, 50), "0.0", "10.0", &raw_perlin_scale, 1.0f, 10.0f);
+    if (std::fabs(raw_perlin_scale - perlin.scale) > 0.0001) {
+      perlin.scale = raw_perlin_scale;
+
+      perlin.generate();
+      map.update_weights();
     }
 
     if (GuiButton(Rectangle(510, 350, 80, 50), "Regenerate")) {
