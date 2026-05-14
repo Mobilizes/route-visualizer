@@ -70,7 +70,7 @@ int main()
 
     for (int i = 0; i < static_cast<int>(map.width); ++i) {
       for (int j = 0; j < static_cast<int>(map.height); ++j) {
-        unsigned char v = map.get()[i][j];
+        unsigned char v = 255 - map.get()[i][j];
         Color c = {v, v, v, 255};
         if (map.get()[i][j] == Map::NONROAD_TILE) c = BLUE;
 
