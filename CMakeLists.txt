@@ -1,22 +1,19 @@
 cmake_minimum_required(VERSION 3.15)
 project(route_visualization LANGUAGES CXX)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-find_package(raylib 5.0 QUIET)
+find_package(raylib 5.5 QUIET)
 
 if(NOT raylib_FOUND)
   FetchContent_Declare(
     raylib
-    URL https://github.com/raysan5/raylib/releases/download/5.5/raylib-5.5_linux_amd64.tar.gz
-        DOWNLOAD_EXTRACT_TIMESTAMP
-        TRUE)
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
+    GIT_TAG 5.5)
   FetchContent_MakeAvailable(raylib)
 endif()
 

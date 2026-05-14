@@ -4,25 +4,19 @@
 #include <array>
 #include <climits>
 #include <queue>
+#include <vector>
 
 const std::array<int, 4> dir_i = {1, 0, -1, 0};
 const std::array<int, 4> dir_j = {0, 1, 0, -1};
-
-class Comparator
-{
-public:
-  bool operator()(const std::vector<long long> & a, const std::vector<long long> & b)
-  {
-    return a[0] > b[0];
-  }
-};
 
 std::optional<std::vector<std::pair<unsigned, unsigned>>> Algo::get_shortest_path(
   Map & map, unsigned src_i, unsigned src_j, unsigned dest_i, unsigned dest_j)
 {
   if (src_i >= map.width || src_j >= map.height) return std::nullopt;
 
-  std::priority_queue<std::vector<long long>, std::vector<std::vector<long long>>, Comparator> pq;
+  std::priority_queue<std::vector<long long>, std::vector<std::vector<long long>>,
+    std::greater<std::vector<long long>>>
+    pq;
   std::vector<std::vector<bool>> visited(map.width, std::vector<bool>(map.height, false));
   std::vector<std::vector<std::pair<long long, unsigned>>> mp(
     map.width, std::vector<std::pair<long long, unsigned>>(map.height, {LLONG_MAX, 5}));

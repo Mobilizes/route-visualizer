@@ -8,9 +8,9 @@ Wrote to be DAA's Quiz 2 Assignment Project.
 
 
 ## Prerequisite
-- C++ >=23
+- C++ >=17
 - CMake >=3.15
-- [Raylib](https://www.raylib.com/)
+- [Raylib](https://www.raylib.com/) installed system-wide, or internet access during CMake configure so it can be fetched automatically.
 
 ## Build from source
 - Create build directory
@@ -18,14 +18,19 @@ Wrote to be DAA's Quiz 2 Assignment Project.
 cmake -S . -B build
 ```
 
-- Build with Make
+- Build with CMake
 ```bash
-cd build && make -j8
+cmake --build build --parallel
 ```
 
 - Run built program
 ```bash
 ./route_visualization
+```
+
+On Windows, the executable may be generated under a configuration directory, for example:
+```powershell
+.\build\Debug\route_visualization.exe
 ```
 
 ## How it works

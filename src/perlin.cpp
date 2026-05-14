@@ -1,6 +1,8 @@
 #include "perlin.hpp"
 
 #include <algorithm>
+#include <cmath>
+#include <numeric>
 #include <stdexcept>
 
 Perlin::Perlin(size_t width, size_t height, double scale)

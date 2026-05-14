@@ -3,10 +3,16 @@
 #include "perlin.hpp"
 
 #include <raylib.h>
-#include <print>
-
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 int main()
 {
@@ -61,7 +67,7 @@ int main()
       for (int j = 0; j < static_cast<int>(map.height); ++j) {
         unsigned char v = map.get()[i][j];
         Color c = {v, v, v, 255};
-        if (map.get()[i][j] == Map::NONROAD_TILE) c = {0, 0, 255, 255};
+        if (map.get()[i][j] == Map::NONROAD_TILE) c = BLUE;
 
         DrawRectangle(
           x_offset + i * pixel_size, y_offset + j * pixel_size, pixel_size, pixel_size, c);
@@ -84,15 +90,17 @@ int main()
       }
     }
 
+    bool reset = false;
+
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
       int mouse_x = GetMouseX();
       int mouse_y = GetMouseY();
 
-      bool reset = false;
+      bool in_map =
+        mouse_x >= x_offset && mouse_x < static_cast<int>(map.width) * pixel_size + x_offset &&
+        mouse_y >= y_offset && mouse_y < static_cast<int>(map.height) * pixel_size + y_offset;
 
-      if (mouse_x < x_offset || mouse_x > static_cast<int>(map.width) * pixel_size + x_offset ||
-          mouse_y < y_offset || mouse_y > static_cast<int>(map.height) * pixel_size + y_offset) {
-        reset = true;
+      if (!in_map) {
       } else if (src_i == UINT32_MAX) {
         src_i = (mouse_x - x_offset) / pixel_size;
         src_j = (mouse_y - y_offset) / pixel_size;
@@ -118,18 +126,10 @@ int main()
       } else {
         reset = true;
       }
-
-      if (reset) {
-        src_i = UINT32_MAX;
-        dest_i = UINT32_MAX;
-        path = std::nullopt;
-      } else {
-        error_message = "";
-      }
     }
 
     DrawText("Render size", 500, 30, 16, BLACK);
-    GuiSliderBar(Rectangle(500, 50, 100, 50), "1", "5", &raw_render_size, 1.0f, 5.0f);
+    GuiSliderBar(Rectangle{500, 50, 100, 50}, "1", "5", &raw_render_size, 1.0f, 5.0f);
     int next_render_size = static_cast<int>(std::round(raw_render_size));
 
     if (next_render_size != render_size) {
@@ -143,39 +143,57 @@ int main()
       map.width = 400 / pixel_size;
       map.height = 400 / pixel_size;
       map.generate();
-
-      src_i = UINT32_MAX;
-      src_j = 0;
-      dest_i = UINT32_MAX;
-      dest_j = 0;
-      path = std::nullopt;
+      reset = true;
     }
 
     DrawText("Chance for initial points to grow", 500, 130, 16, BLACK);
-    GuiSliderBar(Rectangle(500, 150, 100, 50), "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
+    GuiSliderBar(Rectangle{500, 150, 100, 50}, "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
     if (std::fabs(raw_chance - map.chance) > 0.0001) {
       map.chance = raw_chance;
 
       map.generate();
+      reset = true;
     }
 
     DrawText("Perlin Scale", 500, 230, 16, BLACK);
-    GuiSliderBar(Rectangle(500, 250, 100, 50), "0.0", "10.0", &raw_perlin_scale, 1.0f, 10.0f);
+    GuiSliderBar(Rectangle{500, 250, 100, 50}, "1.0", "10.0", &raw_perlin_scale, 1.0f, 10.0f);
     if (std::fabs(raw_perlin_scale - perlin.scale) > 0.0001) {
       perlin.scale = raw_perlin_scale;
 
       perlin.generate();
       map.update_weights();
+
+      if (path.has_value()) {
+        path = Algo::get_shortest_path(map, src_i, src_j, dest_i, dest_j);
+        reset = false;
+      } else {
+        reset = true;
+      }
     }
 
-    if (GuiButton(Rectangle(510, 350, 80, 50), "Regenerate")) {
+    if (GuiButton(Rectangle{500, 350, 100, 50}, "Regenerate Map")) {
       map.generate();
 
+      reset = true;
+    }
+
+    if (GuiButton(Rectangle{650, 350, 100, 50}, "Regenerate Weight")) {
+      map.update_weights();
+
+      if (path.has_value()) {
+        path = Algo::get_shortest_path(map, src_i, src_j, dest_i, dest_j);
+        reset = false;
+      } else {
+        reset = true;
+      }
+    }
+
+    if (reset) {
       src_i = UINT32_MAX;
-      src_j = 0;
       dest_i = UINT32_MAX;
-      dest_j = 0;
       path = std::nullopt;
+    } else {
+      error_message = "";
     }
 
     DrawText(error_message.c_str(), 500, 500, 14, RED);

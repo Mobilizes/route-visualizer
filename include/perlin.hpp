@@ -1,9 +1,10 @@
 #ifndef MAP_GEN_HPP
 #define MAP_GEN_HPP
 
-#include <ctime>
+#include <cstddef>
 #include <random>
 #include <utility>
+#include <vector>
 
 class Perlin
 {

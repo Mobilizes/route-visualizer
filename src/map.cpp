@@ -1,5 +1,6 @@
 #include "map.hpp"
 
+#include <cmath>
 #include <stdexcept>
 
 Map::Map(size_t width, size_t height, unsigned int scale, Perlin & perlin)
@@ -22,16 +23,21 @@ Map::Map(size_t width, size_t height, unsigned int scale, Perlin & perlin)
   }
 
   chance = 0.2;
+  clear();
+}
+
+void Map::clear()
+{
   map.clear();
+  map.assign(width, std::vector<unsigned int>(height, NONROAD_TILE));
+  count_non_empty = 0;
 }
 
 void Map::generate()
 {
   mt = std::mt19937(std::random_device{}());
 
-  map.clear();
-  map.assign(width, std::vector<unsigned int>(height, NONROAD_TILE));
-  count_non_empty = 0;
+  clear();
 
   std::uniform_int_distribution<int> dist_pos_i(0, width - 1);
   std::uniform_int_distribution<int> dist_pos_j(0, height - 1);
@@ -76,7 +82,7 @@ void Map::update_weights()
   }
 }
 
-const std::vector<std::vector<unsigned int>> & Map::get()
+std::vector<std::vector<unsigned int>> & Map::get()
 {
   if (map.empty()) throw std::runtime_error("Perlin: called `get` before `generate()`");
   return map;

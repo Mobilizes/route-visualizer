@@ -4,6 +4,8 @@
 #include "map.hpp"
 
 #include <optional>
+#include <utility>
+#include <vector>
 
 // Algo's lifetime must end at least at the same time as Map
 class Algo

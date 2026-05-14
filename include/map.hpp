@@ -4,6 +4,8 @@
 #include "perlin.hpp"
 
 #include <cstddef>
+#include <cstdint>
+#include <random>
 #include <vector>
 
 // Map's lifetime must end at least at the same time as Perlin
@@ -17,10 +19,11 @@ public:
 
   Map(size_t width, size_t height, unsigned int scale, Perlin & perlin);
 
+  void clear();
   void generate();
   void update_weights();
 
-  const std::vector<std::vector<unsigned int>> & get();
+  std::vector<std::vector<unsigned int>> & get();
 
   size_t width;
   size_t height;
