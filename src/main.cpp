@@ -100,6 +100,8 @@ int main()
         mouse_x >= x_offset && mouse_x < static_cast<int>(map.width) * pixel_size + x_offset &&
         mouse_y >= y_offset && mouse_y < static_cast<int>(map.height) * pixel_size + y_offset;
 
+      error_message = "";
+
       if (!in_map) {
       } else if (src_i == UINT32_MAX) {
         src_i = (mouse_x - x_offset) / pixel_size;
@@ -192,8 +194,6 @@ int main()
       src_i = UINT32_MAX;
       dest_i = UINT32_MAX;
       path = std::nullopt;
-    } else {
-      error_message = "";
     }
 
     DrawText(error_message.c_str(), 500, 500, 14, RED);
