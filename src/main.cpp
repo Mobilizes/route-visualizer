@@ -50,18 +50,23 @@ int main()
   float raw_render_size = render_size;
   float raw_chance = map.chance;
   float raw_perlin_scale = perlin.scale;
+  bool toggle_edit = false;
 
   std::optional<std::vector<std::pair<unsigned, unsigned>>> path = std::nullopt;
+
+  const int lineThick = 4;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(WHITE);
 
-    DrawRectangleGradientH(x_offset, 520, 400, 50, WHITE, BLACK);
-    DrawRectangleLines(x_offset, 520, 400, 50, GRAY);
+    DrawRectangleGradientH(x_offset, y_offset + 460, 400, 50, WHITE, BLACK);
+    DrawRectangleLinesEx(Rectangle{x_offset - lineThick, y_offset + 460 - lineThick,
+                           400 + 2 * lineThick, 50 + 2 * lineThick},
+      lineThick, GRAY);
     DrawText("Weight representation of each tile:", x_offset, 475, 18, BLACK);
-    DrawText("Low", x_offset, 500, 14, BLACK);
-    DrawText("High", x_offset + 375, 500, 14, BLACK);
+    DrawText("Low", x_offset, y_offset + 440, 14, BLACK);
+    DrawText("High", x_offset + 375, y_offset + 440, 14, BLACK);
 
     for (int i = 0; i < static_cast<int>(map.width); ++i) {
       for (int j = 0; j < static_cast<int>(map.height); ++j) {
@@ -73,6 +78,11 @@ int main()
           x_offset + i * pixel_size, y_offset + j * pixel_size, pixel_size, pixel_size, c);
       }
     }
+
+    DrawRectangleLinesEx(Rectangle{x_offset - lineThick, y_offset - lineThick,
+                           static_cast<float>(map.width * pixel_size) + 2 * lineThick,
+                           static_cast<float>(map.height * pixel_size) + 2 * lineThick},
+      lineThick, Color{0, 0, 255, 255});
 
     if (src_i != UINT32_MAX) {
       DrawRectangle(x_offset + diff_size / 2 + src_i * pixel_size,
@@ -92,17 +102,18 @@ int main()
 
     bool reset = false;
 
+    int mouse_x = GetMouseX();
+    int mouse_y = GetMouseY();
+
+    bool in_map =
+      mouse_x >= x_offset && mouse_x < static_cast<int>(map.width) * pixel_size + x_offset &&
+      mouse_y >= y_offset && mouse_y < static_cast<int>(map.height) * pixel_size + y_offset;
+
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-      int mouse_x = GetMouseX();
-      int mouse_y = GetMouseY();
-
-      bool in_map =
-        mouse_x >= x_offset && mouse_x < static_cast<int>(map.width) * pixel_size + x_offset &&
-        mouse_y >= y_offset && mouse_y < static_cast<int>(map.height) * pixel_size + y_offset;
-
       error_message = "";
 
-      if (!in_map) {
+      if (toggle_edit) {
+      } else if (!in_map) {
       } else if (src_i == UINT32_MAX) {
         src_i = (mouse_x - x_offset) / pixel_size;
         src_j = (mouse_y - y_offset) / pixel_size;
@@ -130,8 +141,38 @@ int main()
       }
     }
 
-    DrawText("Render size", 500, 30, 16, BLACK);
-    GuiSliderBar(Rectangle{500, 50, 100, 50}, "1", "5", &raw_render_size, 1.0f, 5.0f);
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+    } else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+      if (toggle_edit) {
+        reset = true;
+
+        if (!in_map) {
+        } else {
+          unsigned i = (mouse_x - x_offset) / pixel_size;
+          unsigned j = (mouse_y - y_offset) / pixel_size;
+
+          map.get()[i][j] = 255;
+        }
+      }
+    } else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+      if (toggle_edit) {
+        reset = true;
+
+        if (!in_map) {
+        } else {
+          unsigned i = (mouse_x - x_offset) / pixel_size;
+          unsigned j = (mouse_y - y_offset) / pixel_size;
+
+          if (map.get()[i][j] != Map::NONROAD_TILE) {
+            map.get()[i][j] = Map::NONROAD_TILE;
+          }
+        }
+      }
+    }
+
+    DrawText("Render size", x_offset + 440, y_offset, 16, BLACK);
+    GuiSliderBar(
+      Rectangle{x_offset + 440, y_offset + 20, 100, 50}, "1", "5", &raw_render_size, 1.0f, 5.0f);
     int next_render_size = static_cast<int>(std::round(raw_render_size));
 
     if (next_render_size != render_size) {
@@ -148,8 +189,9 @@ int main()
       reset = true;
     }
 
-    DrawText("Chance for initial points to grow", 500, 130, 16, BLACK);
-    GuiSliderBar(Rectangle{500, 150, 100, 50}, "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
+    DrawText("Chance for initial points to grow", x_offset + 440, y_offset + 100, 16, BLACK);
+    GuiSliderBar(
+      Rectangle{x_offset + 440, y_offset + 120, 100, 50}, "0.0", "1.0", &raw_chance, 0.0f, 1.0f);
     if (std::fabs(raw_chance - map.chance) > 0.0001) {
       map.chance = raw_chance;
 
@@ -157,8 +199,9 @@ int main()
       reset = true;
     }
 
-    DrawText("Perlin Scale", 500, 230, 16, BLACK);
-    GuiSliderBar(Rectangle{500, 250, 100, 50}, "1.0", "10.0", &raw_perlin_scale, 1.0f, 10.0f);
+    DrawText("Perlin Scale", x_offset + 440, y_offset + 200, 16, BLACK);
+    GuiSliderBar(Rectangle{x_offset + 440, y_offset + 220, 100, 50}, "1.0", "10.0",
+      &raw_perlin_scale, 1.0f, 10.0f);
     if (std::fabs(raw_perlin_scale - perlin.scale) > 0.0001) {
       perlin.scale = raw_perlin_scale;
 
@@ -173,13 +216,13 @@ int main()
       }
     }
 
-    if (GuiButton(Rectangle{500, 350, 100, 50}, "Regenerate Map")) {
+    if (GuiButton(Rectangle{x_offset + 440, y_offset + 320, 100, 50}, "Regenerate Map")) {
       map.generate();
 
       reset = true;
     }
 
-    if (GuiButton(Rectangle{650, 350, 100, 50}, "Regenerate Weight")) {
+    if (GuiButton(Rectangle{x_offset + 590, y_offset + 320, 100, 50}, "Regenerate Weight")) {
       map.update_weights();
 
       if (path.has_value()) {
@@ -190,13 +233,21 @@ int main()
       }
     }
 
+    if (GuiButton(Rectangle{x_offset + 440, y_offset + 420, 100, 50}, "Clear Map")) {
+      map.clear();
+
+      reset = true;
+    }
+
+    GuiCheckBox(Rectangle{x_offset + 590, y_offset + 420, 50, 50}, "Edit", &toggle_edit);
+
     if (reset) {
       src_i = UINT32_MAX;
       dest_i = UINT32_MAX;
       path = std::nullopt;
     }
 
-    DrawText(error_message.c_str(), 500, 500, 14, RED);
+    DrawText(error_message.c_str(), x_offset + 440, y_offset + 500, 14, RED);
 
     EndDrawing();
   }
