@@ -129,7 +129,7 @@ bool Map::grow(int i, int j, int from_dir)
       for (int idx = j - 1; idx >= j - dist; --idx) {
         if (count_non_empty_neighboring_tile(i, idx, from_dir)) break;
 
-        if (map[idx][j] == NONROAD_TILE) count_non_empty++;
+        if (map[i][idx] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
         if (dist_chance(mt) <= chance) grow(i, idx, DIR_LEFT);
         if (dist_chance(mt) <= chance) grow(i, idx, DIR_RIGHT);
@@ -153,7 +153,7 @@ bool Map::grow(int i, int j, int from_dir)
       for (int idx = j + 1; idx <= j + dist; ++idx) {
         if (count_non_empty_neighboring_tile(i, idx, from_dir)) break;
 
-        if (map[idx][j] == NONROAD_TILE) count_non_empty++;
+        if (map[i][idx] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
         if (dist_chance(mt) <= chance) grow(i, idx, DIR_LEFT);
         if (dist_chance(mt) <= chance) grow(i, idx, DIR_RIGHT);
