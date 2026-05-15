@@ -74,18 +74,20 @@ std::pair<double, double> Perlin::const_vector(int v)
 {
   v %= 4;
 
+  double norm_v = 1.0 / std::sqrt(2);
+
   switch (v) {
     case 0:
-      return {1.0, 1.0};
+      return {norm_v, norm_v};
 
     case 1:
-      return {-1.0, 1.0};
+      return {-norm_v, norm_v};
 
     case 2:
-      return {-1.0, -1.0};
+      return {-norm_v, -norm_v};
 
     default:
-      return {1.0, -1.0};
+      return {norm_v, -norm_v};
   }
 }
 

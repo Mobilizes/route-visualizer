@@ -10,7 +10,7 @@ class Perlin
 {
 private:
 public:
-  Perlin(size_t width, size_t height, double volatility);
+  Perlin(size_t width, size_t height, double scale);
 
   double scale;
 

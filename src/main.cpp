@@ -163,20 +163,23 @@ void UpdateDrawFrame(void)
   if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
   } else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
     if (toggle_edit) {
-      reset = true;
-
       if (!in_map) {
       } else {
         unsigned i = (mouse_x - x_offset) / pixel_size;
         unsigned j = (mouse_y - y_offset) / pixel_size;
 
-        map.get()[i][j] = 255;
+        if (map.get()[i][j] == Map::NONROAD_TILE) {
+          map.get()[i][j] = 255;
+          map.update_weights();
+
+          if (src_i != Map::NONROAD_TILE && dest_i != Map::NONROAD_TILE) {
+            path = Algo::get_shortest_path(map, src_i, src_j, dest_i, dest_j);
+          }
+        }
       }
     }
   } else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
     if (toggle_edit) {
-      reset = true;
-
       if (!in_map) {
       } else {
         unsigned i = (mouse_x - x_offset) / pixel_size;
@@ -184,6 +187,17 @@ void UpdateDrawFrame(void)
 
         if (map.get()[i][j] != Map::NONROAD_TILE) {
           map.get()[i][j] = Map::NONROAD_TILE;
+          map.update_weights();
+
+          if ((i == src_i && j == src_j) || (i == dest_i && j == dest_j)) {
+            reset = true;
+          } else {
+            path = Algo::get_shortest_path(map, src_i, src_j, dest_i, dest_j);
+            if (!path.has_value()) {
+              reset = true;
+              error_message = "Path cutoff!";
+            }
+          }
         }
       }
     }
