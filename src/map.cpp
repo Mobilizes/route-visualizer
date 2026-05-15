@@ -130,7 +130,7 @@ bool Map::grow(int i, int j, int from_dir)
   switch (to_dir) {
     case DIR_LEFT: {
       for (int idx = i - 1; idx >= i - dist; --idx) {
-        if (count_non_empty_neighboring_tile(idx, j, from_dir)) break;
+        if (count_non_empty_opposite_dir_tile(idx, j, from_dir)) break;
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[idx][j] = 0;
@@ -142,7 +142,7 @@ bool Map::grow(int i, int j, int from_dir)
 
     case DIR_UP: {
       for (int idx = j - 1; idx >= j - dist; --idx) {
-        if (count_non_empty_neighboring_tile(i, idx, from_dir)) break;
+        if (count_non_empty_opposite_dir_tile(i, idx, from_dir)) break;
 
         if (map[i][idx] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
@@ -154,7 +154,7 @@ bool Map::grow(int i, int j, int from_dir)
 
     case DIR_RIGHT: {
       for (int idx = i + 1; idx <= i + dist; ++idx) {
-        if (count_non_empty_neighboring_tile(idx, j, from_dir)) break;
+        if (count_non_empty_opposite_dir_tile(idx, j, from_dir)) break;
 
         if (map[idx][j] == NONROAD_TILE) count_non_empty++;
         map[idx][j] = 0;
@@ -166,7 +166,7 @@ bool Map::grow(int i, int j, int from_dir)
 
     case DIR_DOWN: {
       for (int idx = j + 1; idx <= j + dist; ++idx) {
-        if (count_non_empty_neighboring_tile(i, idx, from_dir)) break;
+        if (count_non_empty_opposite_dir_tile(i, idx, from_dir)) break;
 
         if (map[i][idx] == NONROAD_TILE) count_non_empty++;
         map[i][idx] = 0;
@@ -180,7 +180,7 @@ bool Map::grow(int i, int j, int from_dir)
   return true;
 }
 
-int Map::count_non_empty_neighboring_tile(int i, int j, int from_dir)
+int Map::count_non_empty_opposite_dir_tile(int i, int j, int from_dir)
 {
   int to_dir = ((from_dir - 1) + 2) % 4 + 1;
   return (i - 1 >= 0 && !(from_dir & 1) && !(to_dir & 1) ? map[i - 1][j] != NONROAD_TILE : 0) +

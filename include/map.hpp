@@ -40,7 +40,7 @@ private:
 
   bool grow(int i, int j, int from_dir);
 
-  int count_non_empty_neighboring_tile(int i, int j, int from_dir);
+  int count_non_empty_opposite_dir_tile(int i, int j, int from_dir);
 
   unsigned int scale;
 
