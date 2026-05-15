@@ -12,6 +12,10 @@ Wrote to be DAA's Quiz 2 Assignment Project.
 - CMake >=3.15
 - [Raylib](https://www.raylib.com/) installed system-wide, or internet access during CMake configure so it can be fetched automatically.
 
+## Demonstration
+https://github.com/user-attachments/assets/56bb8cce-6420-4d43-a317-ab286444b7b6
+
+
 ## Build from source
 - Create build directory
 ```bash
@@ -26,11 +30,6 @@ cmake --build build --parallel
 - Run built program
 ```bash
 ./route_visualization
-```
-
-On Windows, the executable may be generated under a configuration directory, for example:
-```powershell
-.\build\Debug\route_visualization.exe
 ```
 
 ## How it works
