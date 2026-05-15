@@ -1,0 +1,66 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - emscripten-deploy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build web app
+        shell: bash
+        run: |
+          set -euxo pipefail
+
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "${RUNNER_TEMP}/emsdk"
+          "${RUNNER_TEMP}/emsdk/emsdk" install latest
+          "${RUNNER_TEMP}/emsdk/emsdk" activate latest
+          source "${RUNNER_TEMP}/emsdk/emsdk_env.sh"
+
+          emcmake cmake -S . -B build-emscripten -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-emscripten --parallel
+
+          mkdir -p dist
+          cp build-emscripten/route_visualization.html dist/index.html
+          cp build-emscripten/route_visualization.html dist/route_visualization.html
+          cp build-emscripten/route_visualization.js dist/
+          cp build-emscripten/route_visualization.wasm dist/
+          touch dist/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
