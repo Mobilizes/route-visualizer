@@ -223,6 +223,7 @@ int main()
     }
 
     if (GuiButton(Rectangle{x_offset + 590, y_offset + 320, 100, 50}, "Regenerate Weight")) {
+      perlin.generate();
       map.update_weights();
 
       if (path.has_value()) {
